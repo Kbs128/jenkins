@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Récupère le code source depuis un dépôt Git
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Exécute les commandes de construction du projet
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Exécute les tests unitaires
+                sh 'mvn test'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Déploie l'application sur un serveur de production
+                sh 'scp target/*.war user@host:/path/to/deployment'
+            }
+        }
+    }
+
+    post {
+        always {
+            // Envoie un e-mail de notification à l'équipe
+            mail to: 'team@example.com',
+                 subject: "Pipeline Jenkins: ${currentBuild.result}",
+                 body: "Le pipeline Jenkins a terminé avec le statut: ${currentBuild.result}"
+        }
+    }
+}
